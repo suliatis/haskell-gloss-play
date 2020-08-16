@@ -80,12 +80,16 @@ drawPlayer (Player (x, y) s _) =
 update :: Event -> World -> World
 update (EventKey (SpecialKey key) keyState _ _) world =
   let
-    direction' = case (key, keyState) of
-             (KeyLeft, Down)  -> Direction'Left
-             (KeyDown, Down)  -> Direction'Down
-             (KeyUp, Down)    -> Direction'Up
-             (KeyRight, Down) -> Direction'Right
-             (_, _)           -> Direction'No
+    direction' = case (key, keyState, direction $ player world) of
+             (KeyLeft, Down, _)              -> Direction'Left
+             (KeyLeft, Up, Direction'Left)   -> Direction'No
+             (KeyDown, Down, _)              -> Direction'Down
+             (KeyDown, Up, Direction'Down)   -> Direction'No
+             (KeyUp, Down, _)                -> Direction'Up
+             (KeyUp, Up, Direction'Up)       -> Direction'No
+             (KeyRight, Down, _)             -> Direction'Right
+             (KeyRight, Up, Direction'Right) -> Direction'No
+             (_, _, currentDirection)        -> currentDirection
     player' = (player world) { direction = direction' }
   in
     world { player = player' }
